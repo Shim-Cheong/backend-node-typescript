@@ -21,7 +21,7 @@ export default class AuthService {
         password: hashedPassword,
       });
       
-      const token = this.generateToken(userRecord);
+      const token = this.generateToken(userRecord)
 
       if (!userRecord) {
         throw new Error('User cannot be created');
@@ -44,7 +44,7 @@ export default class AuthService {
     return jwt.sign(
       {
         id: user.id,
-        studentNumber: user.studentNumber,
+        studentId: user.studentId,
       },
       config.jwtSecret,
     )
