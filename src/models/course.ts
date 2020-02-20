@@ -7,7 +7,7 @@ import {
 import parse from "csv-parse";
 import fs from "fs";
 
-export class Course implements ICourse {
+class Course implements ICourse {
   public find(filterView: FilterView): Promise<CourseVo[]> {
     const file = this.getFileName(filterView);
     const readStream = fs.createReadStream(`${file}.csv`);
@@ -72,3 +72,6 @@ async function test() {
   console.log(courses);
   console.log(courses[0].courseTime);
 }
+
+const CourseInstance = new Course();
+export default CourseInstance;
