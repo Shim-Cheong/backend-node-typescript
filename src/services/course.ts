@@ -1,9 +1,11 @@
+import { Service, Inject } from 'typedi';
 import { CourseVo, ICourse, IWishList, FilterView } from '../interfaces/ICourse';
 
+@Service()
 export default class CourseService {
   courseModel: ICourse;
 
-  constructor(courseModel: ICourse){
+  constructor(@Inject('courseInstance') courseModel: ICourse){
     this.courseModel = courseModel;
   }
 

@@ -12,5 +12,16 @@ if (!envFound) {
 }
 
 export default {
-  jwtSecret: process.env.JWT_SECRET
+  /**
+   * Your secret sauce
+   */
+  jwtSecret: process.env.JWT_SECRET,
+  
+  /**
+   * API configs
+   */
+  api: {
+    prefix: '/api',
+  },
+
 }
