@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import argon2 from 'argon2';
-import { IUserVo, IUser, IUserInputDTO } from '../interfaces/IUser';
+import { UserVo, IUser, IUserInputDTO } from '../interfaces/IUser';
 import { randomBytes } from 'crypto';
 
 export default class AuthService {
@@ -11,7 +11,7 @@ export default class AuthService {
     this.userModel = userModel;
   }
 
-  public async SignUp(userInputDTO: IUserInputDTO): Promise<{ user: IUserVo; token: string }> {
+  public async SignUp(userInputDTO: IUserInputDTO): Promise<{ user: UserVo; token: string }> {
     try {
       const salt = randomBytes(32);
       const hashedPassword = await argon2.hash(userInputDTO.password, { salt })
@@ -27,16 +27,16 @@ export default class AuthService {
         throw new Error('User cannot be created');
       }
 
-      const user = userRecord.toObject();
-      Reflect.deleteProperty(user, 'password');
-      Reflect.deleteProperty(user, 'salt');
-      return { user, token };
+      
+      Reflect.deleteProperty(userRecord, 'password');
+      Reflect.deleteProperty(userRecord, 'salt');
+      return { user: userRecord, token };
     } catch (e) {
       throw e;
     }
   }
 
-  private generateToken(user: IUser):string {
+  private generateToken(user: UserVo):string {
     const today = new Date();
     const exp = new Date(today);
     exp.setDate(today.getDate() + 60);

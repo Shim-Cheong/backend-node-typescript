@@ -1,4 +1,4 @@
-export type IUserVo = {
+export type UserVo = {
   id: string;
   studentId: string;
   name: string;
@@ -8,16 +8,9 @@ export type IUserVo = {
 }
 
 export interface IUser {
-  id: string;
-  studentId: string;
-  name: string;
-  email: string;
-  password: string;
-  salt: string;
-
-  toObject(): IUserVo;
-  create(props: IUserVo): IUser;
-  findOneById(id: string): IUser;
+  toObject(): UserVo;
+  create(props: UserVo): UserVo;
+  findOneById(id: string): UserVo;
 }
 
 /* 사용자가 입력하는 항목 */
