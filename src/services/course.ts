@@ -5,7 +5,7 @@ import { CourseVo, ICourse, IWishList, FilterView } from '../interfaces/ICourse'
 export default class CourseService {
   courseModel: ICourse;
 
-  constructor(@Inject('courseInstance') courseModel: ICourse){
+  constructor(@Inject('CourseInstance') courseModel: ICourse){
     this.courseModel = courseModel;
   }
 

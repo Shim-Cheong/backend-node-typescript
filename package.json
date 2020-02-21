@@ -31,7 +31,8 @@
     "csv-parse": "^4.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "method-override": "^3.0.0"
   },
   "jest": {
     "transform": {

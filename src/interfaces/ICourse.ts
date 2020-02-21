@@ -39,7 +39,7 @@ export type FilterView = {
 
 export type CourseVo = {
   _id: number;
-  department: Undergraduate; // 개설 부서
+  department: any; // 개설 부서
   code: string;   // 교과목 코드(숫자 4자리)
   classNumber: number;   // 분반
   name: string;   // 교과목명

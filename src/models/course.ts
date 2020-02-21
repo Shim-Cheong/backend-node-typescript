@@ -6,6 +6,7 @@ import {
 } from "../interfaces/ICourse";
 import parse from "csv-parse";
 import fs from "fs";
+import CourseService from "../services/course";
 
 class Course implements ICourse {
   public find(filterView: FilterView): Promise<CourseVo[]> {
@@ -19,14 +20,21 @@ class Course implements ICourse {
       let record;
       while ((record = parser.read())) {
         // 교수님 명단 배열로 변경
-        record.professors = record.professors.split("/");
+        if (record.professors) {
+          record.professors = record.professors.split("/");  
+        }
+        
         // 강/실/학 변경
-        record.credit = {
-          lecture: record.credit.split("/")[0],
-          experiment: record.credit.split("/")[1],
-          grades: record.credit.split("/")[2]
-        };
-        // 강의 시간 배열로 변경
+        if (record.credit) {
+          record.credit = {
+            lecture: record.credit.split("/")[0],
+            experiment: record.credit.split("/")[1],
+            grades: record.credit.split("/")[2]
+          };
+        }
+
+        if (record.courseTime) {
+          // 강의 시간 배열로 변경
         record.courseTime = record.courseTime.split("/").map(
           // x 형태: 화 10:30~12:00/목 10:30~12:00/금 09:00~10:00
           x =>
@@ -36,7 +44,7 @@ class Course implements ICourse {
               endTime: x.split(" ")[1].split("~")[1]
             }
         );
-
+        }
         courses.push(record);
       }
     });
@@ -51,6 +59,9 @@ class Course implements ICourse {
       readStream.on("close", () => {
         resolve(courses);
       });
+      readStream.on('error', (err) => {
+        reject(err);
+      })
     });
   }
 
