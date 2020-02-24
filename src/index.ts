@@ -1,21 +1,23 @@
 import 'reflect-metadata'; // We need this in order to use @Decorators
+import serverless from 'serverless-http';
 
 // import config from './config';
 
 import express from 'express';
-
+import loaders from './loaders';
 // import Logger from './loaders/logger';
 
-async function startServer() {
-  const app = express();
+const app = express();  
 
+async function startServer() {
+  
   /**
    * A little hack here
    * Import/Export can only be used in 'top-level code'
    * Well, at least in node 10 without babel and at the time of writing
    * So we are using good old require.
    **/
-  await require('./loaders').default({ expressApp: app });
+  await loaders({ expressApp: app });
 
   // config.port
   app.listen(3000, () => {
@@ -26,6 +28,10 @@ async function startServer() {
     //   ################################################
     // `);
   });
+
+  return app;
 }
 
 startServer();
+
+module.exports.handler = serverless(app);

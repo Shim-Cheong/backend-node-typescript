@@ -9,7 +9,13 @@ export default (app: Router) => {
 
   route.get("/", async (req: Request, res: Response, next: NextFunction) => {
     const courseServiceInstance = Container.get(CourseService);
-    const { courses } = await courseServiceInstance.List(req.body.filterView);
+    const filterView = {
+      year: req.query.year,
+      semester: req.query.semester,
+      university: req.query.university,
+    }
+
+    const { courses } = await courseServiceInstance.List(filterView);
 
     return res.send({ courses });
   });
