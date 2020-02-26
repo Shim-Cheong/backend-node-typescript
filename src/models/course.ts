@@ -6,36 +6,43 @@ import {
 } from "../interfaces/ICourse";
 import parse from "csv-parse";
 import fs from "fs";
-import CourseService from "../services/course";
+import S3 from "aws-sdk/clients/s3";
+import course from "../api/routes/course";
+
+const s3 = new S3();
 
 class Course implements ICourse {
   public find(filterView: FilterView): Promise<CourseVo[]> {
-    const file = this.getFileName(filterView);
-    const readStream = fs.createReadStream(`${file}.csv`);
+    const bucket = "shim-chung-courses";
+    const fileName = this.getFileName(filterView) + ".csv";
+    const readStream = s3
+      .getObject({ Bucket: bucket, Key: fileName })
+      .createReadStream();
+    // const readStream = fs.createReadStream(fileName);
     const parser = parse({ columns: true });
 
     const courses: CourseVo[] = [];
 
-    parser.on("readable", () => {
-      let record;
-      while ((record = parser.read())) {
-        // 교수님 명단 배열로 변경
-        if (record.professors) {
-          record.professors = record.professors.split("/");  
-        }
-        
-        // 강/실/학 변경
-        if (record.credit) {
-          record.credit = {
-            lecture: record.credit.split("/")[0],
-            experiment: record.credit.split("/")[1],
-            grades: record.credit.split("/")[2]
-          };
-        }
+    readStream.pipe(parser).on("data", data => {
+      
+      if (data.professors) {
+        data.professors = data.professors.split("/");
+      } else {
+        data.professors = [];
+      }
 
-        if (record.courseTime) {
-          // 강의 시간 배열로 변경
-        record.courseTime = record.courseTime.split("/").map(
+      // 강/실/학 변경
+      if (data.credit) {
+        data.credit = {
+          lecture: data.credit.split("/")[0],
+          experiment: data.credit.split("/")[1],
+          grades: data.credit.split("/")[2]
+        };
+      }
+
+      if (data.courseTime) {
+        // 강의 시간 배열로 변경
+        data.courseTime = data.courseTime.split("/").map(
           // x 형태: 화 10:30~12:00/목 10:30~12:00/금 09:00~10:00
           x =>
             <CourseTime>{
@@ -44,24 +51,20 @@ class Course implements ICourse {
               endTime: x.split(" ")[1].split("~")[1]
             }
         );
-        }
-        courses.push(record);
+      } else {
+        // 없을 경우 빈 배열
+        data.courseTime = [];
       }
+      courses.push(data);
     });
-
-    parser.on("error", err => {
-      console.log(err);
-    });
-
-    readStream.pipe(parser);
 
     return new Promise((resolve, reject) => {
-      readStream.on("close", () => {
+      readStream.on("finish", () => {
         resolve(courses);
       });
-      readStream.on('error', (err) => {
+      readStream.on("error", err => {
         reject(err);
-      })
+      });
     });
   }
 
